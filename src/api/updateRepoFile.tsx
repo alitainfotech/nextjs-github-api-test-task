@@ -1,19 +1,19 @@
 import { NextApiHandler, NextApiRequest, NextApiResponse } from "next";
-import GithubCred from "../configs/githubCred";
+import { GithubCredVal } from "../configs/githubCred";
 
 
 const handler: NextApiHandler = async (req: NextApiRequest, res: NextApiResponse) => {
-    const owner = GithubCred.GITHUB_OWNER
-    const apiKey = GithubCred.GITHUB_AUTH_TOKEN
-    const repository = GithubCred.GITHUB_REPOSITORY
+    const { path, sha, message, code } = JSON.parse(req.body)
+    const owner = GithubCredVal.GITHUB_OWNER
+    const apiKey = GithubCredVal.GITHUB_AUTH_TOKEN
+    const repository = GithubCredVal.GITHUB_REPOSITORY
 
-    const { path, sha, message } = JSON.parse(req.body)
     try {
         const response = await fetch(
-            `https://api.github.com/repos/${owner}/${repository}/contents${path ? "/" + path : ""
+            `https://api.github.com/repos/${owner}/${repository}/contents${path ? + path : ""
             }`,
             {
-                method: 'delete',
+                method: 'put',
                 headers: {
                     Accept: "application/vnd.github+json",
                     Authorization:
@@ -21,10 +21,12 @@ const handler: NextApiHandler = async (req: NextApiRequest, res: NextApiResponse
                 },
                 body: JSON.stringify({
                     sha: sha,
-                    message: message.toString()
+                    message: message.toString(),
+                    content: code
                 })
             }
         );
+        console.log(response)
         if (!response.ok) {
             throw new Error(`GitHub API returned ${response.status} and ${response.statusText}`);
         }

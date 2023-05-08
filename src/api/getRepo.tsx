@@ -1,11 +1,11 @@
 import { NextApiHandler } from "next";
-import GithubCred from "../configs/githubCred";
+import { GithubCredVal } from "../configs/githubCred";
 
 
 const handler: NextApiHandler = async (req, res) => {
-  const owner = GithubCred.GITHUB_OWNER
-  const apiKey = GithubCred.GITHUB_AUTH_TOKEN
-  const repository = GithubCred.GITHUB_REPOSITORY
+  const owner = GithubCredVal.GITHUB_OWNER
+  const apiKey = GithubCredVal.GITHUB_AUTH_TOKEN
+  const repository = GithubCredVal.GITHUB_REPOSITORY
 
   const { path } = req.query
   console.log({ owner, apiKey, repository })

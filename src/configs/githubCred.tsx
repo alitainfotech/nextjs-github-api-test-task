@@ -1,4 +1,4 @@
-const GithubCred: {
+export const GithubCredVal: {
     GITHUB_OWNER: string,
     GITHUB_AUTH_TOKEN: string,
     GITHUB_REPOSITORY: string,
@@ -7,5 +7,3 @@ const GithubCred: {
     GITHUB_AUTH_TOKEN: '',
     GITHUB_REPOSITORY: ''
 };
-
-export default GithubCred;

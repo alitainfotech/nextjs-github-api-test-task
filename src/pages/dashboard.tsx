@@ -26,7 +26,7 @@ import {
   AlertTitle,
 } from "@mui/material";
 import { useEffect, useState } from "react";
-import { GitRepositoryInterface, GithubCred } from "./interface/gitRepository.interface";
+import { GitRepositoryInterface, GithubCred } from "../interface/gitRepository.interface";
 import InsertDriveFileIcon from "@mui/icons-material/InsertDriveFile";
 import FolderIcon from "@mui/icons-material/Folder";
 import DeleteIcon from "@mui/icons-material/Delete";
