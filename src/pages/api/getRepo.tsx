@@ -1,15 +1,20 @@
 import { NextApiHandler } from "next";
+import GithubCred from "../configs/githubCred";
 
-const owner = process.env.GITHUB_OWNER
-const apiKey = process.env.GITHUB_AUTH_TOKEN
-const repository = process.env.GITHUB_REPOSITORY
 
 const handler: NextApiHandler = async (req, res) => {
+  const owner = GithubCred.GITHUB_OWNER
+  const apiKey = GithubCred.GITHUB_AUTH_TOKEN
+  const repository = GithubCred.GITHUB_REPOSITORY
+
   const { path } = req.query
-  // if (!owner && !apiKey && !repository) {
-  //   // res.status(500).json({ message: 'Invalid credential' })
-  //   return
-  // }
+  console.log({ owner, apiKey, repository })
+  if (!owner && !apiKey && !repository) {
+    res.status(500).json({ message: 'Invalid credential' })
+    return
+  }
+  console.log(`https://api.github.com/repos/${owner}/${repository}/contents${path ? "/" + path : ""
+    }`)
   try {
     const response = await fetch(
       `https://api.github.com/repos/${owner}/${repository}/contents${path ? "/" + path : ""
@@ -28,6 +33,7 @@ const handler: NextApiHandler = async (req, res) => {
     const data = await response.json();
     res.status(200).json(data);
   } catch (error) {
+    console.log(error)
     res.status(500).json({ error: "Internal Server Error" });
   }
 };

@@ -18,7 +18,6 @@ import {
   DialogTitle,
   TextField,
   Grid,
-  CircularProgress,
   AppBar,
   Toolbar,
   Typography,
@@ -52,7 +51,7 @@ const DashboardPage: React.FC = () => {
 
   const setGithubCred = () => {
     try {
-      localStorage.setItem('GITHUB_CRED', JSON.stringify(githubCred))
+      // localStorage.setItem('GITHUB_CRED', JSON.stringify(githubCred))
       handleGitHubCred(prev => { return { ...prev, settingCred: true } })
       fetch('/api/setGithubConfig', {
         method: 'POST',
@@ -65,10 +64,11 @@ const DashboardPage: React.FC = () => {
         handleGitHubCred(prev => { return { ...prev, settingCred: false } })
         setGitModalStatus(false)
         setBreadCrumb(prev => [...prev])
+        getGithubRepository()
+
       })
     }
     catch (error: Error | any) {
-      console.log(error)
       return (
         <Alert severity="error">
           {error.message}
@@ -78,9 +78,10 @@ const DashboardPage: React.FC = () => {
   }
 
   useEffect(() => {
-    const localGithubCred: any = localStorage.getItem('GITHUB_CRED')
+    const localGithubCred: any = localStorage.removeItem('GITHUB_CRED')
     if (localGithubCred) {
       handleGitHubCred({ ...JSON.parse(localGithubCred), settingCred: false });
+      setBreadCrumb((prev: any) => [...prev])
       setGitModalStatus(false)
     }
   }, []);
@@ -96,7 +97,6 @@ const DashboardPage: React.FC = () => {
     setBreadCrumb([...getPathHierarchy(path + '/')])
     setLoadRepository(true)
     getGithubRepository(path)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currPath])
 
   const getGithubRepository = async (path: string = '') => {
@@ -109,15 +109,12 @@ const DashboardPage: React.FC = () => {
         data.sort((a: GitRepositoryInterface, b: GitRepositoryInterface) =>
           a.type.localeCompare(b.type)
         )
-      } else {
-        onLogout()
-      };
+      }
       setFolders(data);
 
-    } catch (error: Error | any) {
+    } catch (error: any) {
       return (
         <Alert severity="error">
-          <AlertTitle>Error</AlertTitle>
           {error.message}
         </Alert>)
     }
@@ -165,6 +162,7 @@ const DashboardPage: React.FC = () => {
         setCodeData(code)
       }
     } catch (error: Error | any) {
+      console.log(error)
       return (
         <Alert severity="error">
           <AlertTitle>Error</AlertTitle>

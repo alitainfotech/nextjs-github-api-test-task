@@ -1,10 +1,12 @@
 import { NextApiHandler, NextApiRequest, NextApiResponse } from "next";
+import GithubCred from "../configs/githubCred";
 
-const owner = process.env.GITHUB_OWNER
-const apiKey = process.env.GITHUB_AUTH_TOKEN
-const repository = process.env.GITHUB_REPOSITORY
 
 const handler: NextApiHandler = async (req: NextApiRequest, res: NextApiResponse) => {
+    const owner = GithubCred.GITHUB_OWNER
+    const apiKey = GithubCred.GITHUB_AUTH_TOKEN
+    const repository = GithubCred.GITHUB_REPOSITORY
+
     const { path, sha, message } = JSON.parse(req.body)
     try {
         const response = await fetch(
