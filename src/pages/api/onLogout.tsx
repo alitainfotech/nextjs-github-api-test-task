@@ -1,5 +1,5 @@
 import type { NextApiHandler, NextApiRequest, NextApiResponse } from 'next'
-import { GithubCredVal } from '../configs/githubCred';
+import { GithubCredVal } from '../../configs/githubCred';
 
 type Data = {
     message: string

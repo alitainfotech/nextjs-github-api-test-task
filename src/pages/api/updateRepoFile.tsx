@@ -1,5 +1,5 @@
 import { NextApiHandler, NextApiRequest, NextApiResponse } from "next";
-import { GithubCredVal } from "../configs/githubCred";
+import { GithubCredVal } from "../../configs/githubCred";
 
 
 const handler: NextApiHandler = async (req: NextApiRequest, res: NextApiResponse) => {
