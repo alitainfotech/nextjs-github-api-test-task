@@ -1,16 +1,11 @@
 import { NextApiHandler, NextApiRequest, NextApiResponse } from "next";
-import { GithubCredVal } from "../../configs/githubCred";
-
 
 const handler: NextApiHandler = async (req: NextApiRequest, res: NextApiResponse) => {
-    const { path, sha, message, code } = JSON.parse(req.body)
-    const owner = GithubCredVal.GITHUB_OWNER
-    const apiKey = GithubCredVal.GITHUB_AUTH_TOKEN
-    const repository = GithubCredVal.GITHUB_REPOSITORY
-
+    const { path, sha, message, code, owner, apiKey, repository } = JSON.parse(req.body)
+    console.log({ path, sha, message, code, owner, apiKey, repository })
     try {
         const response = await fetch(
-            `https://api.github.com/repos/${owner}/${repository}/contents${path ? + path : ""
+            `https://api.github.com/repos/${owner}/${repository}/contents${path ? '/' + path : ""
             }`,
             {
                 method: 'put',

@@ -24,6 +24,7 @@ import {
   Card,
   Alert,
   AlertTitle,
+  CircularProgress,
 } from "@mui/material";
 import { useEffect, useState } from "react";
 import { GitRepositoryInterface, GithubCred } from "../interface/gitRepository.interface";
@@ -33,7 +34,6 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import GitHubIcon from '@mui/icons-material/GitHub';
 import LogoutIcon from '@mui/icons-material/Logout';
 import CloseIcon from '@mui/icons-material/Close';
-
 import { Editor } from "@monaco-editor/react";
 
 function getPathHierarchy(inputString: string) {
@@ -49,42 +49,7 @@ const DashboardPage: React.FC = () => {
   const [openGitCredDialog, setGitModalStatus] = useState<boolean>(true)
   const [githubCred, handleGitHubCred] = useState<GithubCred>({ owner: '', apiKey: '', repository: '' })
 
-  const setGithubCred = () => {
-    try {
-      // localStorage.setItem('GITHUB_CRED', JSON.stringify(githubCred))
-      handleGitHubCred(prev => { return { ...prev, settingCred: true } })
-      fetch('/api/setGithubConfig', {
-        method: 'POST',
-        body: JSON.stringify({
-          owner: githubCred.owner,
-          apiKey: githubCred.apiKey,
-          repository: githubCred.repository,
-        }),
-      }).then(res => {
-        handleGitHubCred(prev => { return { ...prev, settingCred: false } })
-        setGitModalStatus(false)
-        setBreadCrumb(prev => [...prev])
-        getGithubRepository()
 
-      })
-    }
-    catch (error: Error | any) {
-      return (
-        <Alert severity="error">
-          {error.message}
-        </Alert>)
-    }
-
-  }
-
-  useEffect(() => {
-    const localGithubCred: any = localStorage.removeItem('GITHUB_CRED')
-    if (localGithubCred) {
-      handleGitHubCred({ ...JSON.parse(localGithubCred), settingCred: false });
-      setBreadCrumb((prev: any) => [...prev])
-      setGitModalStatus(false)
-    }
-  }, []);
 
 
   const [folders, setFolders] = useState<GitRepositoryInterface[]>([]);
@@ -101,7 +66,10 @@ const DashboardPage: React.FC = () => {
 
   const getGithubRepository = async (path: string = '') => {
     try {
-      const response = await fetch(`/api/getRepo?path=${path}`);
+      const response = await fetch(`/api/getRepo`, {
+        method: 'post',
+        body: JSON.stringify({ path, owner: githubCred.owner, apiKey: githubCred.apiKey, repository: githubCred.repository })
+      });
       const data = await response.json();
       setLoadRepository(false)
 
@@ -130,7 +98,9 @@ const DashboardPage: React.FC = () => {
       const response = await fetch(
         `/api/deleteRepoFile`, {
         method: 'POST',
-        body: JSON.stringify({ path, sha, message })
+        body: JSON.stringify({
+          path, sha, message, owner: githubCred.owner, apiKey: githubCred.apiKey, repository: githubCred.repository
+        })
       })
       await response.json();
       setDeleteFileData({ path: '', sha: '', message: '' })
@@ -152,7 +122,10 @@ const DashboardPage: React.FC = () => {
   const getFileData = async (path: string) => {
     try {
       setLoadRepository(true)
-      const response = await fetch(`/api/getRepo?path=${path}`);
+      const response = await fetch(`/api/getRepo`, {
+        method: 'post',
+        body: JSON.stringify({ path, owner: githubCred.owner, apiKey: githubCred.apiKey, repository: githubCred.repository })
+      });
       const data = await response.json();
       setCurrentCodeFile(data)
       setLoadRepository(false)
@@ -181,7 +154,7 @@ const DashboardPage: React.FC = () => {
       const response = await fetch(
         `/api/updateRepoFile`, {
         method: 'POST',
-        body: JSON.stringify({ path, sha, message, code })
+        body: JSON.stringify({ path, sha, message, code, owner: githubCred.owner, apiKey: githubCred.apiKey, repository: githubCred.repository })
       })
       const data = await response.json();
       setUpdateFileData({ path: '', sha: '', message: '', code: '' })
@@ -200,20 +173,15 @@ const DashboardPage: React.FC = () => {
 
 
   const onLogout = async () => {
-    localStorage.removeItem('GITHUB_CRED')
     handleGitHubCred({ owner: '', repository: '', apiKey: '' })
     setFolders([])
     setBreadCrumb([])
     setCurrPath('')
     setGitModalStatus(true)
-    let data = await fetch('/api/onLogout')
-    await data.json();
-
   }
 
   return (
     <div>
-
       <Dialog open={openGitCredDialog} onClose={(e, reason) => {
         if (reason && reason == "backdropClick")
           return;
@@ -246,10 +214,11 @@ const DashboardPage: React.FC = () => {
           </Box>
         </DialogContent>
         <DialogActions>
-          {/* {(() => githubCred.settingCred ? <CircularProgress /> : '')()} */}
+          {(() => githubCred.settingCred ? <CircularProgress /> : '')()}
           &nbsp;&nbsp;
           <Button variant="contained" disabled={githubCred.settingCred} onClick={() => {
-            setGithubCred()
+            getGithubRepository()
+            setGitModalStatus(false)
           }}>Get Repository</Button>
         </DialogActions>
       </Dialog>
